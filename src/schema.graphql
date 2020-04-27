@@ -1,0 +1,15 @@
+type Query {
+  info: String!
+  feed: [Day!]!
+}
+
+type Mutation {
+    postDay(content: String!,title: String!): Day!
+}
+
+type Day {
+    id: ID!
+    author: String!
+    content: String!
+    title: String!
+}

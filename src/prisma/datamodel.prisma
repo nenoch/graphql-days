@@ -1,0 +1,7 @@
+type Day {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  content: String!
+  title: String!
+  author: String!
+}
