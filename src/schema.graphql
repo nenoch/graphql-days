@@ -4,12 +4,26 @@ type Query {
 }
 
 type Mutation {
-    postDay(content: String!,title: String!): Day!
+  postDay(content: String!, title: String!): Day!
+  signup(name: String!, password: String!): AuthPayload
+  login(name: String!, password: String!): AuthPayload
 }
 
 type Day {
-    id: ID!
-    author: String!
-    content: String!
-    title: String!
+  id: ID!
+  content: String!
+  title: String!
+  postedBy: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  password: String!
+  days: [Day!]!
+}
+
+type AuthPayload {
+  token: String
+  user: User
 }

@@ -3,5 +3,12 @@ type Day {
   createdAt: DateTime! @createdAt
   content: String!
   title: String!
-  author: String!
+  postedBy: User
+}
+
+type User {
+  id: ID! @id
+  name: String! @unique
+  password: String!
+  days: [Day!]!
 }

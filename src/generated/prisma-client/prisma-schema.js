@@ -7,6 +7,10 @@ module.exports = {
   count: Int!
 }
 
+type AggregateUser {
+  count: Int!
+}
+
 type BatchPayload {
   count: Long!
 }
@@ -18,7 +22,7 @@ type Day {
   createdAt: DateTime!
   content: String!
   title: String!
-  author: String!
+  postedBy: User
 }
 
 type DayConnection {
@@ -31,7 +35,18 @@ input DayCreateInput {
   id: ID
   content: String!
   title: String!
-  author: String!
+  postedBy: UserCreateOneWithoutDaysInput
+}
+
+input DayCreateManyWithoutPostedByInput {
+  create: [DayCreateWithoutPostedByInput!]
+  connect: [DayWhereUniqueInput!]
+}
+
+input DayCreateWithoutPostedByInput {
+  id: ID
+  content: String!
+  title: String!
 }
 
 type DayEdge {
@@ -48,8 +63,6 @@ enum DayOrderByInput {
   content_DESC
   title_ASC
   title_DESC
-  author_ASC
-  author_DESC
 }
 
 type DayPreviousValues {
@@ -57,7 +70,62 @@ type DayPreviousValues {
   createdAt: DateTime!
   content: String!
   title: String!
-  author: String!
+}
+
+input DayScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  content: String
+  content_not: String
+  content_in: [String!]
+  content_not_in: [String!]
+  content_lt: String
+  content_lte: String
+  content_gt: String
+  content_gte: String
+  content_contains: String
+  content_not_contains: String
+  content_starts_with: String
+  content_not_starts_with: String
+  content_ends_with: String
+  content_not_ends_with: String
+  title: String
+  title_not: String
+  title_in: [String!]
+  title_not_in: [String!]
+  title_lt: String
+  title_lte: String
+  title_gt: String
+  title_gte: String
+  title_contains: String
+  title_not_contains: String
+  title_starts_with: String
+  title_not_starts_with: String
+  title_ends_with: String
+  title_not_ends_with: String
+  AND: [DayScalarWhereInput!]
+  OR: [DayScalarWhereInput!]
+  NOT: [DayScalarWhereInput!]
 }
 
 type DaySubscriptionPayload {
@@ -81,13 +149,50 @@ input DaySubscriptionWhereInput {
 input DayUpdateInput {
   content: String
   title: String
-  author: String
+  postedBy: UserUpdateOneWithoutDaysInput
+}
+
+input DayUpdateManyDataInput {
+  content: String
+  title: String
 }
 
 input DayUpdateManyMutationInput {
   content: String
   title: String
-  author: String
+}
+
+input DayUpdateManyWithoutPostedByInput {
+  create: [DayCreateWithoutPostedByInput!]
+  delete: [DayWhereUniqueInput!]
+  connect: [DayWhereUniqueInput!]
+  set: [DayWhereUniqueInput!]
+  disconnect: [DayWhereUniqueInput!]
+  update: [DayUpdateWithWhereUniqueWithoutPostedByInput!]
+  upsert: [DayUpsertWithWhereUniqueWithoutPostedByInput!]
+  deleteMany: [DayScalarWhereInput!]
+  updateMany: [DayUpdateManyWithWhereNestedInput!]
+}
+
+input DayUpdateManyWithWhereNestedInput {
+  where: DayScalarWhereInput!
+  data: DayUpdateManyDataInput!
+}
+
+input DayUpdateWithoutPostedByDataInput {
+  content: String
+  title: String
+}
+
+input DayUpdateWithWhereUniqueWithoutPostedByInput {
+  where: DayWhereUniqueInput!
+  data: DayUpdateWithoutPostedByDataInput!
+}
+
+input DayUpsertWithWhereUniqueWithoutPostedByInput {
+  where: DayWhereUniqueInput!
+  update: DayUpdateWithoutPostedByDataInput!
+  create: DayCreateWithoutPostedByInput!
 }
 
 input DayWhereInput {
@@ -141,20 +246,7 @@ input DayWhereInput {
   title_not_starts_with: String
   title_ends_with: String
   title_not_ends_with: String
-  author: String
-  author_not: String
-  author_in: [String!]
-  author_not_in: [String!]
-  author_lt: String
-  author_lte: String
-  author_gt: String
-  author_gte: String
-  author_contains: String
-  author_not_contains: String
-  author_starts_with: String
-  author_not_starts_with: String
-  author_ends_with: String
-  author_not_ends_with: String
+  postedBy: UserWhereInput
   AND: [DayWhereInput!]
   OR: [DayWhereInput!]
   NOT: [DayWhereInput!]
@@ -173,6 +265,12 @@ type Mutation {
   upsertDay(where: DayWhereUniqueInput!, create: DayCreateInput!, update: DayUpdateInput!): Day!
   deleteDay(where: DayWhereUniqueInput!): Day
   deleteManyDays(where: DayWhereInput): BatchPayload!
+  createUser(data: UserCreateInput!): User!
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -196,11 +294,170 @@ type Query {
   day(where: DayWhereUniqueInput!): Day
   days(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Day]!
   daysConnection(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DayConnection!
+  user(where: UserWhereUniqueInput!): User
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
   day(where: DaySubscriptionWhereInput): DaySubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+}
+
+type User {
+  id: ID!
+  name: String!
+  password: String!
+  days(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Day!]
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]!
+  aggregate: AggregateUser!
+}
+
+input UserCreateInput {
+  id: ID
+  name: String!
+  password: String!
+  days: DayCreateManyWithoutPostedByInput
+}
+
+input UserCreateOneWithoutDaysInput {
+  create: UserCreateWithoutDaysInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutDaysInput {
+  id: ID
+  name: String!
+  password: String!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+enum UserOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  password_ASC
+  password_DESC
+}
+
+type UserPreviousValues {
+  id: ID!
+  name: String!
+  password: String!
+}
+
+type UserSubscriptionPayload {
+  mutation: MutationType!
+  node: User
+  updatedFields: [String!]
+  previousValues: UserPreviousValues
+}
+
+input UserSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: UserWhereInput
+  AND: [UserSubscriptionWhereInput!]
+  OR: [UserSubscriptionWhereInput!]
+  NOT: [UserSubscriptionWhereInput!]
+}
+
+input UserUpdateInput {
+  name: String
+  password: String
+  days: DayUpdateManyWithoutPostedByInput
+}
+
+input UserUpdateManyMutationInput {
+  name: String
+  password: String
+}
+
+input UserUpdateOneWithoutDaysInput {
+  create: UserCreateWithoutDaysInput
+  update: UserUpdateWithoutDaysDataInput
+  upsert: UserUpsertWithoutDaysInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: UserWhereUniqueInput
+}
+
+input UserUpdateWithoutDaysDataInput {
+  name: String
+  password: String
+}
+
+input UserUpsertWithoutDaysInput {
+  update: UserUpdateWithoutDaysDataInput!
+  create: UserCreateWithoutDaysInput!
+}
+
+input UserWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  days_every: DayWhereInput
+  days_some: DayWhereInput
+  days_none: DayWhereInput
+  AND: [UserWhereInput!]
+  OR: [UserWhereInput!]
+  NOT: [UserWhereInput!]
+}
+
+input UserWhereUniqueInput {
+  id: ID
+  name: String
 }
 `
       }

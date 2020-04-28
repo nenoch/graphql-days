@@ -1,43 +1,25 @@
 const { GraphQLServer } = require("graphql-yoga");
-
-const mockDays = [
-  {
-    id: "day-0",
-    author: "Irene",
-    content: "Love listening to my own voice",
-    title: "Prepping",
-  },
-];
-
-let idCount = mockDays.length;
+const { prisma } = require("./generated/prisma-client");
+const Query = require("./resolvers/Query");
+const Mutation = require("./resolvers/Mutation");
+const User = require("./resolvers/User");
+const Day = require("./resolvers/Day");
 
 const resolvers = {
-  Query: {
-    info: () => `This is an API`,
-    feed: () => mockDays,
-  },
-  Mutation: {
-    postDay: (parent, args) => {
-      const day = {
-        id: `day-${idCount++}`,
-        author: args.author || "Anon",
-        title: args.title,
-        content: args.content,
-      };
-      mockDays.push(day);
-      return day;
-    },
-  },
-  Day: {
-    id: (parent) => parent.id,
-    author: (parent) => parent.author,
-    content: (parent) => parent.content,
-    title: (parent) => parent.title,
-  },
+  Query,
+  Mutation,
+  Day,
+  User,
 };
 
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
   resolvers,
+  context: (request) => {
+    return {
+      ...request,
+      prisma,
+    };
+  },
 });
 server.start(() => console.log(`Server is running on http://localhost:4000`));
